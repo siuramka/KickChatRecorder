@@ -17,15 +17,19 @@ namespace KickChatRecorder
         }
         public async Task Run(KickChatClient client)
         {
-            var buffer = new ArraySegment<byte>(new byte[1024]);
             var ms = new MemoryStream();
             var reader = new StreamReader(ms, Encoding.UTF8);
+            var buffer = new ArraySegment<byte>(new byte[1024]);
             while (await _writer.WaitToWriteAsync())
             {
                 var result = await client.ReceiveAsync(buffer, CancellationToken.None);
                 ms.Write(buffer.Array, buffer.Offset, result.Count);
                 ms.Seek(0, SeekOrigin.Begin);
-                await _writer.WriteAsync(await reader.ReadToEndAsync());
+
+                var data = await reader.ReadToEndAsync();
+                Console.WriteLine(data);
+                await _writer.WriteAsync(data);
+                ms.SetLength(0); // Clear the MemoryStream
             }
         }
     }

@@ -32,10 +32,12 @@ namespace KickChatRecorder
                     messageData.Channel = chatDataTemp.Channel;
                     messageData.Data = data;
                     messageData.Event = chatDataTemp.Event;
+                    string fileName = $"{messageData.Channel}.txt";
+                    await File.AppendAllTextAsync(fileName, messageData.ToString() + "\n");
 
-                } catch 
+                } catch(Exception ex)
                 {
-                    Console.WriteLine("Failed to parse message:" + item);
+                    Console.WriteLine("Failed to parse/write message:" + ex);
                 }
             }
         }

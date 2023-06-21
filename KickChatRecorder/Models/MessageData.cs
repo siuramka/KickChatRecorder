@@ -73,5 +73,10 @@ namespace KickChatRecorder.Models
 
         [JsonPropertyName("channel")]
         public string Channel { get; set; }
+
+        public override string ToString()
+        {
+            return $"[{Data.CreatedAt}] {Data.Sender.Username}: {Data.Content}";
+        }
     }
 }
