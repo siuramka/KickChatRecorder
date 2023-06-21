@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace KickChatRecorder.Models
 {
-    public static class KickEvents
+    public class KickChatClientConfiguration
     {
-        public static string ChatMessageEvent = "App\\Events\\ChatMessageEvent";
+        public string ChatroomId { get; set; }
     }
 }
