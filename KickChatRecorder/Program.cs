@@ -7,7 +7,10 @@ using System.Text.Json.Serialization;
 
 namespace KickChatRecorder
 {
-
+    /// <summary>
+    /// add:
+    /// when to record - offline/online/always
+    /// </summary>
     public class Program
     {
         static async Task Main(string[] args)
