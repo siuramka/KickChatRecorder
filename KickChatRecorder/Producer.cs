@@ -27,7 +27,6 @@ namespace KickChatRecorder
                 ms.Seek(0, SeekOrigin.Begin);
 
                 var data = await reader.ReadToEndAsync();
-                Console.WriteLine(data);
                 await _writer.WriteAsync(data);
                 ms.SetLength(0); // Clear the MemoryStream
             }

@@ -13,6 +13,14 @@ namespace KickChatRecorder.Models
         public string Event { get; set; }
         [JsonPropertyName("data")]
         public Data Data { get; set; }
+
+        public ConnectionRequest(string chatroomId)
+        {
+            Event = "pusher:subscribe";
+            Data = new Data();
+            Data.Auth = "";
+            Data.Channel = $"chatrooms.{chatroomId}.v2";
+        }
     }
 
     public class Data

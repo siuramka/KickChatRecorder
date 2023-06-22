@@ -31,12 +31,8 @@ namespace KickChatRecorder
         /// <returns></returns>
         public async Task ConnectAsync()
         {
-            ConnectionRequest connectionRequest = new ConnectionRequest();
-            connectionRequest.Event = "pusher:subscribe";
-            connectionRequest.Data = new Data();
-            connectionRequest.Data.Auth = "";
-            connectionRequest.Data.Channel = $"chatrooms.{_kickChatClientConfiguration.ChatroomId}.v2";
-            var connectionData = JsonSerializer.Serialize(connectionRequest);
+
+            var connectionData = JsonSerializer.Serialize(_kickChatClientConfiguration.ConnectionRequest);
 
             try
             {

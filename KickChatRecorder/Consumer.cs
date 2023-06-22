@@ -21,9 +21,10 @@ namespace KickChatRecorder
         }
         public async Task Run()
         {
-            while(await _reader.WaitToReadAsync())
+            while (await _reader.WaitToReadAsync())
             {
                 var item = await _reader.ReadAsync();
+                Console.WriteLine(item);
                 try
                 {
                     var chatDataTemp = JsonSerializer.Deserialize<TempMessageData>(item);
@@ -35,7 +36,8 @@ namespace KickChatRecorder
                     string fileName = $"{messageData.Channel}.txt";
                     await File.AppendAllTextAsync(fileName, messageData.ToString() + "\n");
 
-                } catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Console.WriteLine("Failed to parse/write message:" + ex);
                 }
