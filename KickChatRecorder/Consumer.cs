@@ -13,6 +13,7 @@ namespace KickChatRecorder
 
     public class Consumer
     {
+        private static readonly object _fileLock = new object();
         private ChannelReader<string> _reader;
         public Consumer(ChannelReader<string> reader)
         {
@@ -33,8 +34,10 @@ namespace KickChatRecorder
                     messageData.Data = data;
                     messageData.Event = chatDataTemp.Event;
                     string fileName = $"{messageData.Channel}.txt";
-                    Console.WriteLine(messageData.Channel);
-                    await File.AppendAllTextAsync(fileName, messageData.ToString() + "\n"); // fire and forget?
+                    lock (_fileLock)
+                    {
+                        File.AppendAllText(fileName, messageData.ToString() + "\n");
+                    }
 
                 }
                 catch (Exception ex)

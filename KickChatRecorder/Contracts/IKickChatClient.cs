@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace KickChatRecorder.Contracts
 {
-    internal interface IKickChatClient
+    public interface IKickChatClient
     {
         Task ConnectAsync();
         Task<WebSocketReceiveResult> ReceiveAsync(ArraySegment<byte> buffer, CancellationToken token);
-
+        Task CloseAsync();
     }
 }

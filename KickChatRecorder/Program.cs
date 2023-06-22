@@ -1,4 +1,5 @@
 ﻿using KickChatRecorder.Models;
+using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
@@ -17,12 +18,18 @@ namespace KickChatRecorder
     {
         static async Task Main(string[] args)
         {
-            KickChatClientFactory factory = new KickChatClientFactory();
-            var client1 = factory.CreateClient("328681");//sam
-            var client2 = factory.CreateClient("166975");//roshen
-            var client3 = factory.CreateClient("4598");//action
-            var client4 = factory.CreateClient("1202499");//hyaba
+            Stopwatch stopwatch = new Stopwatch();
 
+            stopwatch.Start();
+            KickChatClientFactory factory = new KickChatClientFactory();
+            //var client1 = factory.CreateClient("328681");//sam
+            //var client2 = factory.CreateClient("166975");//roshen
+            //var client3 = factory.CreateClient("4598");//action
+            //var client4 = factory.CreateClient("1202499");//hyaba
+            var client1 = factory.CreateTestClient("1");//sam
+            var client2 = factory.CreateTestClient("2");//roshen
+            var client3 = factory.CreateTestClient("3");//action
+            var client4 = factory.CreateTestClient("4");//hyaba
 
             var c1c = client1.ConnectAsync();
             var c2c = client2.ConnectAsync();
@@ -52,16 +59,17 @@ namespace KickChatRecorder
             });
 
 
-            var c1 = Task.Run(() =>
-            {
-                new Consumer(channel.Reader);
-            });
-            var c2 = Task.Run(() =>
+            var c = Task.Run(() =>
             {
                 new Consumer(channel.Reader);
             });
 
-            Task.WaitAll(p,p2,p3,p4,c1, c2);
+
+            Task.WaitAll(p, p2,p3,p4, c);
+
+            stopwatch.Stop();
+
+            Console.WriteLine("Elapsed Time is {0} ms", stopwatch.ElapsedMilliseconds);
         }
     }
 }

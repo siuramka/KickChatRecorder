@@ -44,6 +44,10 @@ namespace KickChatRecorder
                 Console.WriteLine($"ERROR - {ex.Message}");
             }
         }
+        public async Task CloseAsync()
+        {
+            await _socketClient.CloseAsync(WebSocketCloseStatus.NormalClosure,"", CancellationToken.None);
+        }
 
         /// <summary>
         /// Send a message to the websocket connection

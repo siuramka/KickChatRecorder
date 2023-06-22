@@ -1,4 +1,5 @@
-﻿using KickChatRecorder.Models;
+﻿using KickChatRecorder.Contracts;
+using KickChatRecorder.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,10 +12,17 @@ namespace KickChatRecorder
     {
         public KickChatClientFactory() { }
 
-        public KickChatClient CreateClient(string chatroomId)
+        public IKickChatClient CreateClient(string chatroomId)
         {
             KickChatClientConfiguration config = new KickChatClientConfiguration(chatroomId);
-            KickChatClient client = new KickChatClient(config);
+            IKickChatClient client = new KickChatClient(config);
+            return client;
+        }
+
+        public IKickChatClient CreateTestClient(string chatroomId)
+        {
+            KickChatClientConfiguration config = new KickChatClientConfiguration(chatroomId);
+            IKickChatClient client = new TestChatClient(config);
             return client;
         }
     }
