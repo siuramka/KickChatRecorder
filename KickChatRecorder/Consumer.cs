@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -28,11 +29,8 @@ namespace KickChatRecorder
                 try
                 {
                     var chatDataTemp = JsonSerializer.Deserialize<TempMessageData>(item);
-                    var data = JsonSerializer.Deserialize<ChatInfo>(chatDataTemp.Data);
-                    MessageData messageData = new MessageData();
-                    messageData.Channel = chatDataTemp.Channel;
-                    messageData.Data = data;
-                    messageData.Event = chatDataTemp.Event;
+                    var chatInfoTemp = JsonSerializer.Deserialize<ChatInfo>(chatDataTemp.Data);
+                    MessageData messageData = new MessageData(chatDataTemp, chatInfoTemp);
                     string fileName = $"{messageData.Channel}.txt";
                     lock (_fileLock)
                     {
@@ -47,5 +45,6 @@ namespace KickChatRecorder
                 }
             }
         }
+
     }
 }

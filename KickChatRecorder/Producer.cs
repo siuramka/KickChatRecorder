@@ -21,10 +21,10 @@ namespace KickChatRecorder
         {
             var ms = new MemoryStream();
             var reader = new StreamReader(ms, Encoding.UTF8);
-            var buffer = new byte[16*1024];
-            try
+            var buffer = new byte[1 * 1024];
+            while (await _writer.WaitToWriteAsync())
             {
-                while (await _writer.WaitToWriteAsync())
+                try
                 {
                     //var result = await client.ReceiveAsync(buffer, CancellationToken.None);
                     var receiveTask = client.ReceiveAsync(buffer, CancellationToken.None);
@@ -40,7 +40,7 @@ namespace KickChatRecorder
                     }
 
                     var result = receiveTask.Result;
-  
+
                     ms.Write(buffer, 0, result.Count);
                     ms.Seek(0, SeekOrigin.Begin);
 
@@ -49,9 +49,11 @@ namespace KickChatRecorder
                     ms.SetLength(0); // Clear the MemoryStream
                     ms.Seek(0, SeekOrigin.Begin);
                 }
-
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Failed to produce item " + ex);
+                }
             }
-            catch { }
         }
     }
 }
