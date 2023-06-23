@@ -83,7 +83,7 @@ namespace KickChatRecorder.Models
         }
         public override string ToString()
         {
-            return $"[{Data.CreatedAt}] {Data.Sender.Username}: {Data.Content}";
+            return $"[{Data.CreatedAt}] {Data.Sender.Username}: {Data.Content} {Channel}";
         }
     }
 }

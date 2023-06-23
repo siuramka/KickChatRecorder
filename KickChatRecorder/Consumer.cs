@@ -8,43 +8,56 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace KickChatRecorder
 {
 
     public class Consumer
     {
-        private static readonly object _fileLock = new object();
         private ChannelReader<string> _reader;
-        public Consumer(ChannelReader<string> reader)
+        private ChannelWriter<List<MessageData>> _fileStreamWriter;
+        public Consumer(ChannelReader<string> reader, ChannelWriter<List<MessageData>> fileStreamWriter)
         {
             _reader = reader;
+            _fileStreamWriter = fileStreamWriter;
             Task.WaitAll(this.Run());
         }
         public async Task Run()
         {
+            List<MessageData> batch = new List<MessageData>();
+
             while (await _reader.WaitToReadAsync())
             {
                 var item = await _reader.ReadAsync();
+
                 try
                 {
                     var chatDataTemp = JsonSerializer.Deserialize<TempMessageData>(item);
                     var chatInfoTemp = JsonSerializer.Deserialize<ChatInfo>(chatDataTemp.Data);
                     MessageData messageData = new MessageData(chatDataTemp, chatInfoTemp);
                     string fileName = $"{messageData.Channel}.txt";
-                    lock (_fileLock)
+                    Console.WriteLine(item + "\n");
+                    //File.AppendAllText(fileName, messageData.ToString() + "\n");
+                    if (batch.Count < 10)
                     {
-                        File.AppendAllText(fileName, messageData.ToString() + "\n");
+                        batch.Add(messageData);
                     }
-
+                    else if (batch.Count >= 10)
+                    {
+                        await _fileStreamWriter.WriteAsync(batch);
+                        batch = new List<MessageData>();
+                    }
+        
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine("Failed to parse/write message:" + ex);
                     Console.WriteLine(item);
+                    
                 }
             }
+            
         }
-
     }
 }

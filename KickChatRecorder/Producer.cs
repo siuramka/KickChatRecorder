@@ -30,15 +30,14 @@ namespace KickChatRecorder
                     var receiveTask = client.ReceiveAsync(buffer, CancellationToken.None);
                     var timeoutTask = Task.Delay(TimeSpan.FromSeconds(2)); // Adjust the timeout duration as needed
 
-                    var completedTask = await Task.WhenAny(receiveTask, timeoutTask);
+                    var completedTask = await Task.WhenAny(receiveTask);
 
-                    if (completedTask == timeoutTask)
-                    {
-                        Console.WriteLine("DONE");
-                        await client.CloseAsync();
-                        _writer.Complete();
-                    }
-
+                    //if (completedTask == timeoutTask)
+                    //{
+                    //    Console.WriteLine("DONE");
+                    //    await client.CloseAsync();
+                    //    _writer.TryComplete();
+                    //}
                     var result = receiveTask.Result;
 
                     ms.Write(buffer, 0, result.Count);
