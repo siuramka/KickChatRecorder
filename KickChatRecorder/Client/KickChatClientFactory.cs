@@ -1,13 +1,8 @@
 ﻿using KickChatRecorder.Contracts;
 using KickChatRecorder.Models;
 using KickChatRecorder.Test;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace KickChatRecorder
+namespace KickChatRecorder.Client
 {
     public class KickChatClientFactory
     {

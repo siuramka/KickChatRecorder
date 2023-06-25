@@ -1,14 +1,10 @@
 ﻿using KickChatRecorder.Contracts;
 using KickChatRecorder.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
-namespace KickChatRecorder
+namespace KickChatRecorder.Client
 {
     public class KickChatClient : IKickChatClient, IDisposable
     {
@@ -21,7 +17,7 @@ namespace KickChatRecorder
 
         public KickChatClient(KickChatClientConfiguration kickChatClientConfiguration)
         {
-            this._socketClient = new ClientWebSocket();
+            _socketClient = new ClientWebSocket();
             _kickChatClientConfiguration = kickChatClientConfiguration;
         }
 
@@ -46,7 +42,7 @@ namespace KickChatRecorder
         }
         public async Task CloseAsync()
         {
-            await _socketClient.CloseAsync(WebSocketCloseStatus.NormalClosure,"", CancellationToken.None);
+            await _socketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
         }
 
         /// <summary>

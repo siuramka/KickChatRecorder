@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KickChatRecorder.Contracts
+﻿namespace KickChatRecorder.Contracts
 {
-    internal class IProducer
+    public interface IProducer
     {
+        Task Run(IKickChatClient client);
     }
 }

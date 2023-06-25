@@ -1,14 +1,7 @@
 ﻿using Cassandra;
-using KickChatRecorder.Models;
+using KickChatRecorder.Client;
 using KickChatRecorder.Service;
-using System.Diagnostics;
-using System.Net.WebSockets;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
 using System.Threading.Channels;
-using System.Threading.Tasks;
 
 
 ///
@@ -32,14 +25,13 @@ namespace KickChatRecorder
         {
             var channel = Channel.CreateUnbounded<string>();
             List<Task> tasks = new List<Task>();
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
 
             Cluster cluster = Cluster.Builder()
             .AddContactPoint("localhost")
             .Build();
 
             ISession session = cluster.Connect("store");
+
             CassandraService cassandraService = new CassandraService(session);
 
             KickChatClientFactory factory = new KickChatClientFactory();
@@ -102,7 +94,7 @@ namespace KickChatRecorder
                 await client.ConnectAsync();
                 var p = Task.Run(() =>
                 {
-                    new Producer(channel.Writer, client);
+                    new TestProducer(channel.Writer, client);
                 });
                 tasks.Add(p);
             }
@@ -117,18 +109,11 @@ namespace KickChatRecorder
             }
             //20prod 20consum - Elapsed Time is 28408 ms
             //20prod 4consum  - Elapsed Time is 37698 ms
-            //var cstream = Task.Run(() =>
-            //{
-            //    new DatabaseConsumer(writeToFileStream.Reader, cassandraService);
-            //});
-            //tasks.Add(cstream);
 
 
             Task.WaitAll(tasks.ToArray());
 
-            stopwatch.Stop();
             session.Dispose();
-            Console.WriteLine("Elapsed Time is {0} ms", stopwatch.ElapsedMilliseconds);
         }
     }
 }
