@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CassandraCSharpDriver" Version="3.19.2" />
     <PackageReference Include="System.Net.WebSockets" Version="4.3.0" />
   </ItemGroup>
 

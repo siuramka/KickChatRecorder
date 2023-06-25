@@ -1,5 +1,6 @@
 ﻿using KickChatRecorder.Contracts;
 using KickChatRecorder.Models;
+using KickChatRecorder.Test;
 using System;
 using System.Collections.Generic;
 using System.Linq;

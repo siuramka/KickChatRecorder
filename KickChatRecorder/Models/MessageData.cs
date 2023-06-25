@@ -58,7 +58,7 @@ namespace KickChatRecorder.Models
         public string Type { get; set; }
 
         [JsonPropertyName("created_at")]
-        public DateTimeOffset CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         [JsonPropertyName("sender")]
         public Sender Sender { get; set; }

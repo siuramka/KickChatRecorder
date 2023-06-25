@@ -8,7 +8,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace KickChatRecorder.Clients
+namespace KickChatRecorder.Test
 {
     public class TestChatClient : IKickChatClient
     {

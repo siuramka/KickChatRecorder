@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
-namespace KickChatRecorder
+namespace KickChatRecorder.Test
 {
     public class TestProducer : IProducer
     {
@@ -26,7 +26,19 @@ namespace KickChatRecorder
             {
                 try
                 {
-                    var result = await client.ReceiveAsync(buffer, CancellationToken.None);
+                    //var result = await client.ReceiveAsync(buffer, CancellationToken.None);
+                    var receiveTask = client.ReceiveAsync(buffer, CancellationToken.None);
+                    var timeoutTask = Task.Delay(TimeSpan.FromSeconds(30)); // Adjust the timeout duration as needed
+
+                    var completedTask = await Task.WhenAny(receiveTask, timeoutTask);
+
+                    if (completedTask == timeoutTask)
+                    {
+                        Console.WriteLine("DONE");
+                        await client.CloseAsync();
+                        _writer.TryComplete();
+                    }
+                    var result = receiveTask.Result;
 
                     ms.Write(buffer, 0, result.Count);
                     ms.Seek(0, SeekOrigin.Begin);

@@ -1,4 +1,5 @@
 ﻿using KickChatRecorder.Models;
+using KickChatRecorder.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,17 +17,15 @@ namespace KickChatRecorder
     public class Consumer
     {
         private ChannelReader<string> _reader;
-        private ChannelWriter<List<MessageData>> _fileStreamWriter;
-        public Consumer(ChannelReader<string> reader, ChannelWriter<List<MessageData>> fileStreamWriter)
+        private CassandraService _cassandraService;
+        public Consumer(ChannelReader<string> reader, CassandraService cassandraService)
         {
             _reader = reader;
-            _fileStreamWriter = fileStreamWriter;
+            _cassandraService = cassandraService;
             Task.WaitAll(this.Run());
         }
         public async Task Run()
         {
-            List<MessageData> batch = new List<MessageData>();
-
             while (await _reader.WaitToReadAsync())
             {
                 var item = await _reader.ReadAsync();
@@ -36,19 +35,16 @@ namespace KickChatRecorder
                     var chatDataTemp = JsonSerializer.Deserialize<TempMessageData>(item);
                     var chatInfoTemp = JsonSerializer.Deserialize<ChatInfo>(chatDataTemp.Data);
                     MessageData messageData = new MessageData(chatDataTemp, chatInfoTemp);
-                    string fileName = $"{messageData.Channel}.txt";
-                    Console.WriteLine(item + "\n");
-                    //File.AppendAllText(fileName, messageData.ToString() + "\n");
-                    if (batch.Count < 10)
+                    try
                     {
-                        batch.Add(messageData);
+                        await _cassandraService.InsertChannel(messageData);
+                        await _cassandraService.InsertMessage(messageData);
                     }
-                    else if (batch.Count >= 10)
+                    catch
                     {
-                        await _fileStreamWriter.WriteAsync(batch);
-                        batch = new List<MessageData>();
+                        Console.WriteLine("FAIL");
                     }
-        
+
                 }
                 catch (Exception ex)
                 {
