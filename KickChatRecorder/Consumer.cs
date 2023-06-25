@@ -16,9 +16,9 @@ namespace KickChatRecorder
 
     public class Consumer
     {
-        private ChannelReader<string> _reader;
+        private ChannelReader<MessageData> _reader;
         private CassandraService _cassandraService;
-        public Consumer(ChannelReader<string> reader, CassandraService cassandraService)
+        public Consumer(ChannelReader<MessageData> reader, CassandraService cassandraService)
         {
             _reader = reader;
             _cassandraService = cassandraService;
@@ -29,26 +29,17 @@ namespace KickChatRecorder
             while (await _reader.WaitToReadAsync())
             {
                 var item = await _reader.ReadAsync();
-
+             
                 try
                 {
-                    var chatDataTemp = JsonSerializer.Deserialize<TempMessageData>(item);
-                    var chatInfoTemp = JsonSerializer.Deserialize<ChatInfo>(chatDataTemp.Data);
-                    MessageData messageData = new MessageData(chatDataTemp, chatInfoTemp);
-                    try
-                    {
-                        await _cassandraService.InsertChannel(messageData);
-                        await _cassandraService.InsertMessage(messageData);
-                    }
-                    catch
-                    {
-                        Console.WriteLine("FAIL");
-                    }
+
+                    await _cassandraService.InsertChannel(item);
+                    await _cassandraService.InsertMessage(item);
 
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Failed to parse/write message:" + ex);
+                    Console.WriteLine("Failed to insert to database" + ex);
                     Console.WriteLine(item);
                     
                 }

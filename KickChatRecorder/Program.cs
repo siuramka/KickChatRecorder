@@ -1,5 +1,6 @@
 ﻿using Cassandra;
 using KickChatRecorder.Client;
+using KickChatRecorder.Models;
 using KickChatRecorder.Service;
 using System.Threading.Channels;
 
@@ -23,7 +24,7 @@ namespace KickChatRecorder
     {
         static async Task Main(string[] args)
         {
-            var channel = Channel.CreateUnbounded<string>();
+            var channel = Channel.CreateUnbounded<MessageData>();
             List<Task> tasks = new List<Task>();
 
             Cluster cluster = Cluster.Builder()
@@ -35,78 +36,61 @@ namespace KickChatRecorder
             CassandraService cassandraService = new CassandraService(session);
 
             KickChatClientFactory factory = new KickChatClientFactory();
-            //var client1 = factory.CreateTestClient("1");
-            //var client2 = factory.CreateTestClient("2");
-            //var client3 = factory.CreateTestClient("3");
-            //var client4 = factory.CreateTestClient("4");
-            //var client5 = factory.CreateTestClient("5");
-            //var client6 = factory.CreateTestClient("6");
-            //var client7 = factory.CreateTestClient("7");
-            //var client8 = factory.CreateTestClient("8");
-            //var client9 = factory.CreateTestClient("9");
-            //var client10 = factory.CreateTestClient("10");
-            ////var client1 = factory.CreateClient("328681");//sam
-            ////var client2 = factory.CreateClient("166975");//roshen
-            ////var client3 = factory.CreateClient("4598");//action
-            ////var client4 = factory.CreateClient("1202499");//hyaba
-            ////145222 ice
-            ////sam
-            ////var client2 = factory.CreateTestClient("2");//roshen
-            ////var client3 = factory.CreateTestClient("3");//action
-            ////var client4 = factory.CreateTestClient("4");//hyaba
+            var client1 = factory.CreateClient("1202499");
+            var client2 = factory.CreateClient("4598");
 
-            //var c1c = client1.ConnectAsync();
-            //var c2c = client2.ConnectAsync();
-            //var c3c = client3.ConnectAsync();
-            //var c4c = client4.ConnectAsync();
-            //var c5c = client5.ConnectAsync();
-            //var c6c = client6.ConnectAsync();
-            //var c7c = client7.ConnectAsync();
-            //var c8c = client8.ConnectAsync();
-            //var c9c = client9.ConnectAsync();
-            //var c10c = client10.ConnectAsync();
-
-            //Task.WaitAll(c1c, c2c, c3c,c3c,c5c,c6c,c7c,c8c,c9c,c10c);
+            var c1c = client1.ConnectAsync();
+            var c2c = client2.ConnectAsync();
 
 
-            ////var writeToFileStream = Channel.CreateBounded<List<MessageData>>(new BoundedChannelOptions(100)
-            ////{
-            ////    SingleReader = true,
-            ////    SingleWriter = false,
-            ////    FullMode = BoundedChannelFullMode.Wait
-            ////});
-            //var writeToFileStream = Channel.CreateUnbounded<List<MessageData>>();
+            Task.WaitAll(c1c, c2c);
 
-            //var p1 = Task.Run(() =>
-            //{
-            //    new Producer(channel.Writer, client1);
-            //});
-            //tasks.Add(p1);
-            //var p2 = Task.Run(() =>
-            //{
-            //    new Producer(channel.Writer, client2);
-            //});
-            //tasks.Add(p2);
 
-            for (int i = 0; i < 20; i++)
+
+            var p1 = Task.Run(() =>
             {
-                var client = factory.CreateTestClient(i.ToString());
-                await client.ConnectAsync();
-                var p = Task.Run(() =>
-                {
-                    new TestProducer(channel.Writer, client);
-                });
-                tasks.Add(p);
-            }
-
-            for (int i = 0; i < 4; i++)
+                new Producer(channel.Writer, client1);
+            });
+            tasks.Add(p1);
+            var p2 = Task.Run(() =>
             {
-                var c = Task.Run(() =>
-                {
-                    new Consumer(channel.Reader, cassandraService);
-                });
-                tasks.Add(c);
-            }
+                new Producer(channel.Writer, client2);
+            });
+            tasks.Add(p2);
+
+            var c1 = Task.Run(() =>
+            {
+                new Consumer(channel.Reader, cassandraService);
+            });
+            tasks.Add(c1);
+
+            var c2 = Task.Run(() =>
+            {
+                new Consumer(channel.Reader, cassandraService);
+            });
+            tasks.Add(c2);
+
+
+            //test
+            //for (int i = 0; i < 20; i++)
+            //{
+            //    var client = factory.CreateTestClient(i.ToString());
+            //    await client.ConnectAsync();
+            //    var p = Task.Run(() =>
+            //    {
+            //        new TestProducer(channel.Writer, client);
+            //    });
+            //    tasks.Add(p);
+            //}
+
+            //for (int i = 0; i < 4; i++)
+            //{
+            //    var c = Task.Run(() =>
+            //    {
+            //        new Consumer(channel.Reader, cassandraService);
+            //    });
+            //    tasks.Add(c);
+            //}
             //20prod 20consum - Elapsed Time is 28408 ms
             //20prod 4consum  - Elapsed Time is 37698 ms
 

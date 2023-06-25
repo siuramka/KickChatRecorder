@@ -1,13 +1,15 @@
 ﻿using KickChatRecorder.Contracts;
+using KickChatRecorder.Models;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Channels;
 
 namespace KickChatRecorder
 {
-    public class TestProducer : IProducer
+    public class Producer : IProducer
     {
-        private ChannelWriter<string> _writer;
-        public TestProducer(ChannelWriter<string> writer, IKickChatClient client)
+        private ChannelWriter<MessageData> _writer;
+        public Producer(ChannelWriter<MessageData> writer, IKickChatClient client)
         {
             _writer = writer ?? throw new ArgumentNullException(nameof(writer));
             Task.WaitAll(this.Run(client));
@@ -27,8 +29,16 @@ namespace KickChatRecorder
                     ms.Seek(0, SeekOrigin.Begin);
 
                     var data = await reader.ReadToEndAsync();
+    
+                    if(data.Contains(KickChatEvents.ChatMessageEvent))
+                    {
+                        var chatDataTemp = JsonSerializer.Deserialize<TempMessageData>(data);
+                        var chatInfoTemp = JsonSerializer.Deserialize<ChatInfo>(chatDataTemp.Data);
+                        MessageData messageData = new MessageData(chatDataTemp, chatInfoTemp);
 
-                    await _writer.WriteAsync(data);
+                        await _writer.WriteAsync(messageData);
+                    }
+
                     ms.SetLength(0); // Clear the MemoryStream
                     ms.Seek(0, SeekOrigin.Begin);
                 }

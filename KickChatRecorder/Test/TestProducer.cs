@@ -28,7 +28,8 @@ namespace KickChatRecorder.Test
                 {
                     //var result = await client.ReceiveAsync(buffer, CancellationToken.None);
                     var receiveTask = client.ReceiveAsync(buffer, CancellationToken.None);
-                    var timeoutTask = Task.Delay(TimeSpan.FromSeconds(30)); // Adjust the timeout duration as needed
+                    var timeoutTask = Task.Delay(TimeSpan.FromSeconds(30)); // Adjust the timeout duration as needed 
+                                                                            // This will wait n seconds until after it doesn't receive from ws
 
                     var completedTask = await Task.WhenAny(receiveTask, timeoutTask);
 
