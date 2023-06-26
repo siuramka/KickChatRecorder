@@ -43,6 +43,8 @@ namespace KickChatRecorder
                     ms.SetLength(0); // Clear the MemoryStream
                     ms.Seek(0, SeekOrigin.Begin);
                 }
+                catch (ChannelClosedException)
+                { }
                 catch (Exception ex)
                 {
                     Console.WriteLine("Failed to produce item " + ex);
@@ -51,6 +53,11 @@ namespace KickChatRecorder
             if (_writer.TryComplete())
             {
                 Console.WriteLine("Writer closed...");
+            }
+            else
+            {
+                Console.WriteLine("Writer already completed!");
+
             }
         }
     }

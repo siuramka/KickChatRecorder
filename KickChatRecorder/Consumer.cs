@@ -45,7 +45,8 @@ namespace KickChatRecorder
                     }
                 }
 
-            }catch (ChannelClosedException)
+            }
+            catch (ChannelClosedException)
             {
                 Console.WriteLine("Channel has been closed per request...");
             }
