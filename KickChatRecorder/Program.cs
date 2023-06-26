@@ -28,6 +28,8 @@ namespace KickChatRecorder
         {
             //unbounded rn - would get memory bounded if theres a lot of data coming from the producerss
             var channel = Channel.CreateUnbounded<MessageData>();
+            var ct = new CancellationTokenSource(10000);
+            var token = ct.Token;
 
             List<Task> tasks = new List<Task>();
 
@@ -60,7 +62,7 @@ namespace KickChatRecorder
             {
                 var prod = Task.Run(() =>
                 {
-                    new Producer(channel.Writer, client);
+                    new Producer(channel.Writer, client, token);
                 });
                 tasks.Add(prod);
             }

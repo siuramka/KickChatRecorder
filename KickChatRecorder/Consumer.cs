@@ -26,23 +26,29 @@ namespace KickChatRecorder
         }
         public async Task Run()
         {
-            while (await _reader.WaitToReadAsync())
+            try
             {
-                var item = await _reader.ReadAsync();
+                while (await _reader.WaitToReadAsync())
+                {
+                    var item = await _reader.ReadAsync();
              
-                try
-                {
-                    await _cassandraService.InsertMessage(item);
+                    try
+                    {
+                        await _cassandraService.InsertMessage(item);
 
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Failed to insert to database" + ex);
-                    Console.WriteLine(item);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Failed to insert to database" + ex);
+                        Console.WriteLine(item);
                     
+                    }
                 }
+
+            }catch (ChannelClosedException)
+            {
+                Console.WriteLine("Channel has been closed per request...");
             }
-            
         }
     }
 }
