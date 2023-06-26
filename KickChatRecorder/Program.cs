@@ -1,7 +1,9 @@
 ﻿using Cassandra;
 using KickChatRecorder.Client;
+using KickChatRecorder.Contracts;
 using KickChatRecorder.Models;
 using KickChatRecorder.Service;
+using Microsoft.VisualBasic;
 using System.Threading.Channels;
 
 
@@ -24,52 +26,65 @@ namespace KickChatRecorder
     {
         static async Task Main(string[] args)
         {
+            //unbounded rn - would get memory bounded if theres a lot of data coming from the producerss
             var channel = Channel.CreateUnbounded<MessageData>();
+
             List<Task> tasks = new List<Task>();
 
             Cluster cluster = Cluster.Builder()
             .AddContactPoint("localhost")
             .Build();
-
             ISession session = cluster.Connect("store");
-
             CassandraService cassandraService = new CassandraService(session);
 
             KickChatClientFactory factory = new KickChatClientFactory();
-            var client1 = factory.CreateClient("1202499");
-            var client2 = factory.CreateClient("4598");
 
-            var c1c = client1.ConnectAsync();
-            var c2c = client2.ConnectAsync();
+            var channelsToListen = await cassandraService.GetChannels();
 
+            List<Task> socketTasks = new List<Task>();
+            List<IKickChatClient> clients = new List<IKickChatClient>();
 
-            Task.WaitAll(c1c, c2c);
-
-
-
-            var p1 = Task.Run(() =>
+            foreach (var chan in channelsToListen)
             {
-                new Producer(channel.Writer, client1);
-            });
-            tasks.Add(p1);
-            var p2 = Task.Run(() =>
-            {
-                new Producer(channel.Writer, client2);
-            });
-            tasks.Add(p2);
+                var client = factory.CreateClient(chan.channel_id);
+                var clientConnection = client.ConnectAsync();
+                socketTasks.Add(clientConnection);
+                clients.Add(client);
+            };
 
-            var c1 = Task.Run(() =>
-            {
-                new Consumer(channel.Reader, cassandraService);
-            });
-            tasks.Add(c1);
 
-            var c2 = Task.Run(() =>
+            //block the calling thread untill all websockets have established connection
+            Task.WaitAll(socketTasks.ToArray());
+            //create a producer for each channel listening
+            foreach (var client in clients)
             {
-                new Consumer(channel.Reader, cassandraService);
-            });
-            tasks.Add(c2);
+                var prod = Task.Run(() =>
+                {
+                    new Producer(channel.Writer, client);
+                });
+                tasks.Add(prod);
+            }
 
+            //Create 0.5 consumers for each producer
+            int consCount = tasks.Count / 2;
+
+            if (consCount < 10)
+            {
+                consCount = 2;
+            }
+
+            for (int i = 0; i < consCount; i++)
+            {
+                var c = Task.Run(() =>
+                {
+                    new Consumer(channel.Reader, cassandraService);
+                });
+                tasks.Add(c);
+            }
+            //block calling thread - wait, forever pretty much rn
+            Task.WaitAll(tasks.ToArray());
+
+            session.Dispose();
 
             //test
             //for (int i = 0; i < 20; i++)
@@ -83,21 +98,10 @@ namespace KickChatRecorder
             //    tasks.Add(p);
             //}
 
-            //for (int i = 0; i < 4; i++)
-            //{
-            //    var c = Task.Run(() =>
-            //    {
-            //        new Consumer(channel.Reader, cassandraService);
-            //    });
-            //    tasks.Add(c);
-            //}
             //20prod 20consum - Elapsed Time is 28408 ms
             //20prod 4consum  - Elapsed Time is 37698 ms
 
 
-            Task.WaitAll(tasks.ToArray());
-
-            session.Dispose();
         }
     }
 }

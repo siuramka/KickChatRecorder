@@ -1,7 +1,7 @@
 ﻿using KickChatRecorder.Contracts;
 using KickChatRecorder.Models;
 using System.Text;
-using System.Text.Json;
+using KickChatRecorder.Helpers;
 using System.Threading.Channels;
 
 namespace KickChatRecorder
@@ -30,13 +30,13 @@ namespace KickChatRecorder
 
                     var data = await reader.ReadToEndAsync();
     
+                    // write only chat messages
                     if(data.Contains(KickChatEvents.ChatMessageEvent))
                     {
-                        var chatDataTemp = JsonSerializer.Deserialize<TempMessageData>(data);
-                        var chatInfoTemp = JsonSerializer.Deserialize<ChatInfo>(chatDataTemp.Data);
-                        MessageData messageData = new MessageData(chatDataTemp, chatInfoTemp);
-
-                        await _writer.WriteAsync(messageData);
+                        await _writer.WriteAsync(ProducerHelper.GetMessageFromString(data));
+                    } else
+                    {
+                        Console.WriteLine(data);
                     }
 
                     ms.SetLength(0); // Clear the MemoryStream

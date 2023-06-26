@@ -32,8 +32,6 @@ namespace KickChatRecorder
              
                 try
                 {
-
-                    await _cassandraService.InsertChannel(item);
                     await _cassandraService.InsertMessage(item);
 
                 }

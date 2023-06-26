@@ -2,6 +2,7 @@
 using Cassandra.Mapping;
 using KickChatRecorder.Models;
 using KickChatRecorder.Models.DTO;
+using System.Security.AccessControl;
 
 namespace KickChatRecorder.Service
 {
@@ -47,6 +48,10 @@ namespace KickChatRecorder.Service
             };
 
             await _mapper.InsertAsync(messageInsert);
+        }
+        public async Task<IEnumerable<Channels>> GetChannels()
+        {
+            return await _mapper.FetchAsync<Channels>();
         }
     }
 }
