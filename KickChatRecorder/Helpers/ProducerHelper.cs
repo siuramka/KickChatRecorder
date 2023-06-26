@@ -10,9 +10,14 @@ namespace KickChatRecorder.Helpers
 {
     public static class ProducerHelper
     {
-        public static MessageData GetMessageFromString(string data)
+        /// <summary>
+        /// Deserializes string json message data into a MessageData object
+        /// </summary>
+        /// <param name="jsonData">JSON data containing message info</param>
+        /// <returns>Deserialized jsonData MessasgeData object</returns>
+        public static MessageData GetMessageFromString(string jsonData)
         {
-            var chatDataTemp = JsonSerializer.Deserialize<TempMessageData>(data);
+            var chatDataTemp = JsonSerializer.Deserialize<TempMessageData>(jsonData);
             chatDataTemp.Channel = GetChannelId(chatDataTemp);
 
             var chatInfoTemp = JsonSerializer.Deserialize<ChatInfo>(chatDataTemp.Data);
@@ -20,6 +25,12 @@ namespace KickChatRecorder.Helpers
 
             return messageData;
         }
+
+        /// <summary>
+        /// Gets the channel ID from a string - channels.{id}.v2 => id
+        /// </summary>
+        /// <param name="tempMessage">Temporary deserialized MessageData</param>
+        /// <returns>channel id</returns>
         private static string GetChannelId(TempMessageData tempMessage)
         {
             return tempMessage.Channel.Split('.')[1];

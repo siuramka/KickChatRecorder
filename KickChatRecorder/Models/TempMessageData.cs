@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace KickChatRecorder.Models
 {
+    /// <summary>
+    /// Tempory class to deserialization as the original strint for deserialization doesnt follow C# JSON encoding format.
+    /// </summary>
     public class TempMessageData
     {
         [JsonPropertyName("event")]

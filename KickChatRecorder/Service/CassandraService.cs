@@ -21,7 +21,9 @@ namespace KickChatRecorder.Service
         //see https://github.com/search?q=repo%3Adatastax%2Fcsharp-driver+execute&type=code
         //also https://www.datastax.com/blog/asynchronous-queries-java-driver (java)
 
-        /// Mapper uses a lot of cpu usage - 20% of 100% total used - per performance profiler
+        // Mapper uses a lot of cpu usage - 20% of 100% total used - per performance profiler
+       
+
         public async Task<AppliedInfo<Channels>> InsertChannel(MessageData message)
         {
             var channel = new Channels

@@ -30,7 +30,7 @@ namespace KickChatRecorder.Test
                     var receiveTask = client.ReceiveAsync(buffer, CancellationToken.None);
                     var timeoutTask = Task.Delay(TimeSpan.FromSeconds(30)); // Adjust the timeout duration as needed 
                                                                             // This will wait n seconds until after it doesn't receive from ws
-
+                                                                            // should re write and just send like "donezo" from the test ws server
                     var completedTask = await Task.WhenAny(receiveTask, timeoutTask);
 
                     if (completedTask == timeoutTask)
