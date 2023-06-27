@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KickChatRecorder.Models
+namespace KickChatRecorder.Models.Config
 {
     public class ConnectionConfig
     {
         public ConnectionRequest ConnectionRequest { get; set; }
-        public ConnectionConfig(string pusherEvent, string auth, string chatroomId) {
+        public ConnectionConfig(string pusherEvent, string auth, string chatroomId)
+        {
             ConnectionRequest = new ConnectionRequest(chatroomId);
             ConnectionRequest.Event = pusherEvent;
             ConnectionRequest.Data = new Data();

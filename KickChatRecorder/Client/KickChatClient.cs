@@ -1,5 +1,5 @@
 ﻿using KickChatRecorder.Contracts;
-using KickChatRecorder.Models;
+using KickChatRecorder.Models.Config;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;

@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace KickChatRecorder.Models
 {
-    public static class PusherConfig
+    public class KickEvent
     {
+        [JsonPropertyName("event")]
+        public string Event { get; set; }
     }
 }
