@@ -12,7 +12,7 @@ namespace KickChatRecorder
     public class Producer
     {
         private ChannelWriter<MessageData> _writer;
-        private static CancellationToken _timeoutToken;
+        private CancellationToken _timeoutToken;
         public Producer(ChannelWriter<MessageData> writer, IKickChatClientWithSend client, CancellationToken token)
         {
             _writer = writer ?? throw new ArgumentNullException(nameof(writer));
