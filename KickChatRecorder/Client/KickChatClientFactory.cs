@@ -14,6 +14,12 @@ namespace KickChatRecorder.Client
             IKickChatClient client = new KickChatClient(config);
             return client;
         }
+        public IKickChatClientWithSend CreateClientSendable(string chatroomId)
+        {
+            KickChatClientConfiguration config = new KickChatClientConfiguration(chatroomId);
+            IKickChatClientWithSend client = new KickChatClient(config);
+            return client;
+        }
 
         public IKickChatClient CreateTestClient(string chatroomId)
         {

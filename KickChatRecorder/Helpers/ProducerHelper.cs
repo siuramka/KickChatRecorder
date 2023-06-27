@@ -1,4 +1,5 @@
-﻿using KickChatRecorder.Models;
+﻿using KickChatRecorder.Contracts;
+using KickChatRecorder.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +35,25 @@ namespace KickChatRecorder.Helpers
         private static string GetChannelId(TempMessageData tempMessage)
         {
             return tempMessage.Channel.Split('.')[1];
+        }
+
+        public static async Task ReccuringSendPing(IKickChatClientWithSend client, int seconds, CancellationToken token, CancellationToken timeoutToken)
+        {
+            try
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    if(timeoutToken.IsCancellationRequested)
+                    {
+                        await client.Send(JsonSerializer.Serialize(new Ping()));
+                    }
+                    await Task.Delay(TimeSpan.FromSeconds(seconds), token);
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                Console.WriteLine("cancl");
+            }
         }
     }
 }

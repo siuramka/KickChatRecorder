@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace KickChatRecorder.Client
 {
-    public class KickChatClient : IKickChatClient, IDisposable
+    public class KickChatClient : IKickChatClientWithSend, IDisposable
     {
         /// <summary>
         /// Pusher wss connection. Protocol version must be higher than v3
@@ -45,17 +45,7 @@ namespace KickChatRecorder.Client
             await _socketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
         }
 
-        /// <summary>
-        /// Send a message to the websocket connection
-        /// 
-        /// Private since only reading messages
-        /// 
-        /// Used for initial pusher event subscribtion
-        /// </summary>
-        /// <param name="socket"></param>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        private async Task Send(string data)
+        public async Task Send(string data)
         {
             await _socketClient.SendAsync(Encoding.UTF8.GetBytes(data), WebSocketMessageType.Text, true, CancellationToken.None);
         }

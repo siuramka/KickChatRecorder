@@ -4,6 +4,7 @@ using KickChatRecorder.Contracts;
 using KickChatRecorder.Models;
 using KickChatRecorder.Service;
 using Microsoft.VisualBasic;
+using System;
 using System.Threading.Channels;
 
 
@@ -28,7 +29,7 @@ namespace KickChatRecorder
         {
             //unbounded rn - would get memory bounded if theres a lot of data coming from the producerss
             var channel = Channel.CreateUnbounded<MessageData>();
-            var ct = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            var ct = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             var token = ct.Token;
 
             List<Task> tasks = new List<Task>();
@@ -44,15 +45,19 @@ namespace KickChatRecorder
             var channelsToListen = await cassandraService.GetChannels();
 
             List<Task> socketTasks = new List<Task>();
-            List<IKickChatClient> clients = new List<IKickChatClient>();
+            List<IKickChatClientWithSend> clients = new List<IKickChatClientWithSend>();
 
-            foreach (var chan in channelsToListen)
-            {
-                var client = factory.CreateClient(chan.channel_id);
-                var clientConnection = client.ConnectAsync();
-                socketTasks.Add(clientConnection);
-                clients.Add(client);
-            };
+            //foreach (var chan in channelsToListen)
+            //{
+            //    var client = factory.CreateClientSendable(chan.channel_id);
+            //    var clientConnection = client.ConnectAsync();
+            //    socketTasks.Add(clientConnection);
+            //    clients.Add(client);
+            //};
+            var cn = factory.CreateClientSendable("10878");
+            var clientConnection = cn.ConnectAsync();
+            socketTasks.Add(clientConnection);
+            clients.Add(cn);
 
 
             //block the calling thread untill all websockets have established connection
@@ -75,7 +80,7 @@ namespace KickChatRecorder
                 consCount = 2;
             }
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 1; i++)
             {
                 var c = Task.Run(() =>
                 {
