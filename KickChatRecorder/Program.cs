@@ -29,7 +29,7 @@ namespace KickChatRecorder
         {
             //unbounded rn - would get memory bounded if theres a lot of data coming from the producerss
             var channel = Channel.CreateUnbounded<MessageData>();
-            var ct = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+            var ct = new CancellationTokenSource(TimeSpan.FromSeconds(30));
             var token = ct.Token;
 
             List<Task> tasks = new List<Task>();
@@ -80,7 +80,7 @@ namespace KickChatRecorder
                 consCount = 2;
             }
 
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 3; i++)
             {
                 var c = Task.Run(() =>
                 {

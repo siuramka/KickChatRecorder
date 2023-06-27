@@ -12,13 +12,30 @@ namespace KickChatRecorder
     public class Producer
     {
         private ChannelWriter<MessageData> _writer;
-        private CancellationToken _timeoutToken;
+        private static CancellationToken _timeoutToken;
         public Producer(ChannelWriter<MessageData> writer, IKickChatClientWithSend client, CancellationToken token)
         {
             _writer = writer ?? throw new ArgumentNullException(nameof(writer));
             _timeoutToken = new CancellationTokenSource(TimeSpan.FromSeconds(PusherConfig.ActivityTimeoutSeconds)).Token; // create initial timeout
 
-            var pingTask = ProducerHelper.ReccuringSendPing(client, TimeSpan.FromSeconds(PusherConfig.ActivityTimeoutSeconds), token, _timeoutToken);
+            var pingTask = Task.Run(async () =>
+            {            
+                try
+                {
+                    while (!token.IsCancellationRequested)
+                    {
+                        if (_timeoutToken.IsCancellationRequested)
+                        {
+                            await client.Send(JsonSerializer.Serialize(new Ping()));
+                        }
+                        await Task.Delay(TimeSpan.FromSeconds(PusherConfig.ActivityTimeoutSeconds), token);
+                    }
+                }
+                catch (TaskCanceledException) // method will throw canceled because if cancellation token but I want it completed so it will eat the exception and complete task instead
+                { }
+
+            });
+
             var producerTask = this.Run(client, token);
 
             Task.WaitAll(producerTask, pingTask);// will wait till ping is send even if theres a token cancellation request
@@ -81,6 +98,7 @@ namespace KickChatRecorder
         {
             if (kickEvent.Event == KickChatEvents.ChatMessageEvent)
             {
+                Console.WriteLine("data");
                 await _writer.WriteAsync(ProducerHelper.GetMessageFromString(data));
             }
             else if (kickEvent.Event == KickChatEvents.PongEvent)
@@ -91,6 +109,10 @@ namespace KickChatRecorder
             {
                 Console.WriteLine("Undefined event: " + kickEvent.Event);
             }
+        }
+        public static async Task ReccuringSendPing(IKickChatClientWithSend client, TimeSpan timeoutTime, CancellationToken token, CancellationToken timeoutToken)
+        {
+
         }
 
     }
