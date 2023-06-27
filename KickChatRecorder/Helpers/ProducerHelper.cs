@@ -36,32 +36,5 @@ namespace KickChatRecorder.Helpers
         {
             return tempMessage.Channel.Split('.')[1];
         }
-
-        /// <summary>
-        /// 
-        /// Method used to send a ping/ping to websocket client
-        /// 
-        /// </summary>
-        /// <param name="client">KickChatClient that can send to websocket</param>
-        /// <param name="timeoutTime">At how often send a ping </param>
-        /// <param name="token">Main cancellation token for closing all channels,producers, consumers etc</param>
-        /// <param name="timeoutToken">whenether or not it has passed X ammount of time since last message was received</param>
-        /// <returns>completed task</returns>
-        public static async Task ReccuringSendPing(IKickChatClientWithSend client, TimeSpan timeoutTime, CancellationToken token, CancellationToken timeoutToken)
-        {
-            try
-            {
-                while (!token.IsCancellationRequested)
-                {
-                    if(timeoutToken.IsCancellationRequested)
-                    {
-                        await client.Send(JsonSerializer.Serialize(new Ping()));
-                    }
-                    await Task.Delay(timeoutTime, token);
-                }
-            }
-            catch (TaskCanceledException) // method will throw canceled because if cancellation token but I want it completed so it will eat the exception and complete task instead
-            { }
-        }
     }
 }

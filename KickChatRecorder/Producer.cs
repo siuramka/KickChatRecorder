@@ -17,7 +17,7 @@ namespace KickChatRecorder
         {
             _writer = writer ?? throw new ArgumentNullException(nameof(writer));
             _timeoutToken = new CancellationTokenSource(TimeSpan.FromSeconds(PusherConfig.ActivityTimeoutSeconds)).Token; // create initial timeout
-
+            
             var pingTask = Task.Run(async () =>
             {            
                 try
@@ -31,7 +31,7 @@ namespace KickChatRecorder
                         await Task.Delay(TimeSpan.FromSeconds(PusherConfig.ActivityTimeoutSeconds), token);
                     }
                 }
-                catch (TaskCanceledException) // method will throw canceled because if cancellation token but I want it completed so it will eat the exception and complete task instead
+                catch (TaskCanceledException) // method will throw canceled because of cancellation token but I want it completed so it will eat the exception and complete task instead
                 { }
 
             });
@@ -47,7 +47,7 @@ namespace KickChatRecorder
             var reader = new StreamReader(ms, Encoding.UTF8);
             var buffer = new byte[1 * 1024];
 
-            while (!token.IsCancellationRequested) // only checks if receives message from ws, but gets pinged every - not any more since i added pinging heheeheh
+            while (!token.IsCancellationRequested)
             {
                 try
                 {
@@ -110,10 +110,16 @@ namespace KickChatRecorder
                 Console.WriteLine("Undefined event: " + kickEvent.Event);
             }
         }
-        public static async Task ReccuringSendPing(IKickChatClientWithSend client, TimeSpan timeoutTime, CancellationToken token, CancellationToken timeoutToken)
-        {
-
-        }
-
+        /// <summary>
+        /// 
+        /// Method used to send a ping/ping to websocket client
+        /// 
+        /// </summary>
+        /// <param name="client">KickChatClient that can send to websocket</param>
+        /// <param name="timeoutTime">At how often send a ping </param>
+        /// <param name="token">Main cancellation token for closing all channels,producers, consumers etc</param>
+        /// <param name="timeoutToken">whenether or not it has passed X ammount of time since last message was received</param>
+        /// <returns>completed task</returns>
+        /// pingTask 
     }
 }
