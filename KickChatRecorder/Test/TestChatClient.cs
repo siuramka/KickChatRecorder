@@ -1,5 +1,5 @@
 ﻿using KickChatRecorder.Contracts;
-using KickChatRecorder.Models.Config;
+using KickChatRecorder.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace KickChatRecorder.Test
 {
-    public class TestChatClient : IKickChatClient
+    public class TestChatClient : IKickChatClientWithSend
     {
         private static readonly string _connectionString = "ws://localhost:4444";
         private KickChatClientConfiguration _kickChatClientConfiguration;
@@ -40,7 +40,10 @@ namespace KickChatRecorder.Test
         {
             return await _socketClient.ReceiveAsync(buffer, token);
         }
-
+        public async Task Send(string data)
+        {
+            await _socketClient.SendAsync(Encoding.UTF8.GetBytes(data), WebSocketMessageType.Text, true, CancellationToken.None);
+        }
         public void Dispose()
         {
             _socketClient.Dispose();

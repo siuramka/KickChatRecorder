@@ -11,6 +11,8 @@ namespace KickChatRecorder.Models.Config
         //User writes a message event.
         public static string ChatMessageEvent = @"App\Events\ChatMessageEvent";
         public static string PongEvent = @"pusher:pong";
+        public static string Connected = @"pusher:connection_established";
+        public static string Subscribed = @"pusher_internal:subscription_succeeded";
 
     }
 }

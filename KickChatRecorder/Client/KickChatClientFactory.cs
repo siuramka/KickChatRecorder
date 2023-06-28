@@ -1,5 +1,5 @@
 ﻿using KickChatRecorder.Contracts;
-using KickChatRecorder.Models.Config;
+using KickChatRecorder.Models;
 using KickChatRecorder.Test;
 
 namespace KickChatRecorder.Client
@@ -21,10 +21,10 @@ namespace KickChatRecorder.Client
             return client;
         }
 
-        public IKickChatClient CreateTestClient(string chatroomId)
+        public IKickChatClientWithSend CreateTestClientSendable(string chatroomId)
         {
             KickChatClientConfiguration config = new KickChatClientConfiguration(chatroomId);
-            IKickChatClient client = new TestChatClient(config);
+            IKickChatClientWithSend client = new TestChatClient(config);
             return client;
         }
     }

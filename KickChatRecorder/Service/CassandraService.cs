@@ -36,6 +36,12 @@ namespace KickChatRecorder.Service
 
             return result;
         }
+        public async Task<AppliedInfo<Channels>> InsertChannel(Channels channel)
+        {
+            var result = await _mapper.InsertIfNotExistsAsync(channel);
+
+            return result;
+        }
 
         public async Task InsertMessage(MessageData message)
         {

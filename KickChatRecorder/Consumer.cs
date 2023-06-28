@@ -24,15 +24,13 @@ namespace KickChatRecorder
                     var item = await _reader.ReadAsync();
              
                     try
-                    {
+                    {                      
                         await _cassandraService.InsertMessage(item);
-
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine("Failed to insert to database" + ex);
                         Console.WriteLine(item);
-                    
                     }
                 }
 

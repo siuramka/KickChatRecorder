@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KickChatRecorder.Models.Config
+namespace KickChatRecorder.Models
 {
     public class KickChatClientConfiguration
     {

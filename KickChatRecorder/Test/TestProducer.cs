@@ -1,60 +1,80 @@
 ﻿using KickChatRecorder.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.WebSockets;
+using KickChatRecorder.Models;
 using System.Text;
+using KickChatRecorder.Helpers;
 using System.Threading.Channels;
-using System.Threading.Tasks;
+using KickChatRecorder.Models.Config;
+using System.Text.Json;
+using System.Linq.Expressions;
+using Newtonsoft.Json.Linq;
+using System.Reflection.PortableExecutable;
 
-namespace KickChatRecorder.Test
+namespace KickChatRecorder
 {
-    public class TestProducer : IProducer
+    public class TestProducer
     {
-        private ChannelWriter<string> _writer;
-        public TestProducer(ChannelWriter<string> writer, IKickChatClient client)
+        private ChannelWriter<MessageData> _writer;
+        private CancellationToken _token;
+        public TestProducer(ChannelWriter<MessageData> writer, IKickChatClientWithSend client, CancellationToken token)
         {
             _writer = writer ?? throw new ArgumentNullException(nameof(writer));
-            Task.WaitAll(this.Run(client));
+            _token = token;
+
+            var producerTask = this.Run(client);
+            try
+            {
+                Task.WaitAll(producerTask);
+
+            } catch
+            {
+                Task.Run(client.CloseAsync);
+            }
         }
-        public async Task Run(IKickChatClient client)
+
+        public async Task Run(IKickChatClientWithSend client)
         {
             var ms = new MemoryStream();
             var reader = new StreamReader(ms, Encoding.UTF8);
             var buffer = new byte[1 * 1024];
-            while (await _writer.WaitToWriteAsync())
+            try
             {
-                try
+                while (!_token.IsCancellationRequested)
                 {
-                    //var result = await client.ReceiveAsync(buffer, CancellationToken.None);
-                    var receiveTask = client.ReceiveAsync(buffer, CancellationToken.None);
-                    var timeoutTask = Task.Delay(TimeSpan.FromSeconds(30)); // Adjust the timeout duration as needed 
-                                                                            // This will wait n seconds until after it doesn't receive from ws
-                                                                            // should re write and just send like "donezo" from the test ws server
-                    var completedTask = await Task.WhenAny(receiveTask, timeoutTask);
-
-                    if (completedTask == timeoutTask)
-                    {
-                        Console.WriteLine("DONE");
-                        await client.CloseAsync();
-                        _writer.TryComplete();
-                    }
-                    var result = receiveTask.Result;
+                    var result = await client.ReceiveAsync(buffer, _token);
 
                     ms.Write(buffer, 0, result.Count);
                     ms.Seek(0, SeekOrigin.Begin);
 
                     var data = await reader.ReadToEndAsync();
+                
+                    try
+                    {
+                        await _writer.WriteAsync(ProducerHelper.GetMessageFromString(data));
+                    }
+                    catch { }
 
-                    await _writer.WriteAsync(data);
+
                     ms.SetLength(0); // Clear the MemoryStream
                     ms.Seek(0, SeekOrigin.Begin);
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Failed to produce item " + ex);
-                }
             }
+            catch
+            {
+                _token = new CancellationTokenSource(1).Token;
+            }
+
         }
+
+        /// <summary>
+        /// 
+        /// Method used to send a ping/ping to websocket client
+        /// 
+        /// </summary>
+        /// <param name="client">KickChatClient that can send to websocket</param>
+        /// <param name="timeoutTime">At how often send a ping </param>
+        /// <param name="token">Main cancellation token for closing all channels,producers, consumers etc</param>
+        /// <param name="timeoutToken">whenether or not it has passed X ammount of time since last message was received</param>
+        /// <returns>completed task</returns>
+        /// pingTask 
     }
 }

@@ -72,7 +72,6 @@ namespace KickChatRecorder
 
                     ms.SetLength(0); // Clear the MemoryStream
                     ms.Seek(0, SeekOrigin.Begin);
-
                 }
                 catch (ChannelClosedException)
                 { }
@@ -98,12 +97,19 @@ namespace KickChatRecorder
         {
             if (kickEvent.Event == KickChatEvents.ChatMessageEvent)
             {
-                Console.WriteLine("data");
                 await _writer.WriteAsync(ProducerHelper.GetMessageFromString(data));
             }
             else if (kickEvent.Event == KickChatEvents.PongEvent)
             {
                 Console.WriteLine("PONG");
+            }
+            else if (kickEvent.Event == KickChatEvents.Connected)
+            {
+                Console.WriteLine("Connected...");
+            }
+            else if (kickEvent.Event == KickChatEvents.Subscribed)
+            {
+                Console.WriteLine("Listening...");
             }
             else
             {

@@ -1,5 +1,5 @@
 ﻿using KickChatRecorder.Contracts;
-using KickChatRecorder.Models.Config;
+using KickChatRecorder.Models;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
@@ -37,7 +37,7 @@ namespace KickChatRecorder.Client
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"ERROR - {ex.Message}");
+                Console.WriteLine($"Failed connection to ws! - {ex.Message}");
             }
         }
         public async Task CloseAsync()

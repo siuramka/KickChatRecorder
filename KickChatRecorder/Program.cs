@@ -1,6 +1,7 @@
 ﻿using Cassandra;
 using KickChatRecorder.Client;
 using KickChatRecorder.Contracts;
+using KickChatRecorder.Helpers;
 using KickChatRecorder.Models;
 using KickChatRecorder.Service;
 using Microsoft.VisualBasic;
@@ -22,14 +23,20 @@ namespace KickChatRecorder
     /// <summary>
     /// add:
     /// when to record - offline/online/always
+    /// 
+    /// 1 producer 2 to 2.5 consumers is the fastest per tests
     /// </summary>
     public class Program
     {
         static async Task Main(string[] args)
         {
-            //unbounded rn - would get memory bounded if theres a lot of data coming from the producerss
+
             var channel = Channel.CreateUnbounded<MessageData>();
-            var ct = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+            var restartTime = MainHelper.GetTillFutureHour(9);
+            var ct = new CancellationTokenSource(restartTime);
+
+            Console.WriteLine("Restart in: " + restartTime.ToString());
+
             var token = ct.Token;
 
             List<Task> tasks = new List<Task>();
@@ -40,28 +47,23 @@ namespace KickChatRecorder
             ISession session = cluster.Connect("store");
             CassandraService cassandraService = new CassandraService(session);
 
-            KickChatClientFactory factory = new KickChatClientFactory();
-
             var channelsToListen = await cassandraService.GetChannels();
 
             List<Task> socketTasks = new List<Task>();
             List<IKickChatClientWithSend> clients = new List<IKickChatClientWithSend>();
 
-            //foreach (var chan in channelsToListen)
-            //{
-            //    var client = factory.CreateClientSendable(chan.channel_id);
-            //    var clientConnection = client.ConnectAsync();
-            //    socketTasks.Add(clientConnection);
-            //    clients.Add(client);
-            //};
-            var cn = factory.CreateClientSendable("10878");
-            var clientConnection = cn.ConnectAsync();
-            socketTasks.Add(clientConnection);
-            clients.Add(cn);
-
+            KickChatClientFactory factory = new KickChatClientFactory();
+            foreach (var chan in channelsToListen)
+            {
+                var client = factory.CreateClientSendable(chan.channel_id);
+                var clientConnection = client.ConnectAsync();
+                socketTasks.Add(clientConnection);
+                clients.Add(client);
+            };
 
             //block the calling thread untill all websockets have established connection
             Task.WaitAll(socketTasks.ToArray());
+
             //create a producer for each channel listening
             foreach (var client in clients)
             {
@@ -72,15 +74,12 @@ namespace KickChatRecorder
                 tasks.Add(prod);
             }
 
-            //Create 0.5 consumers for each producer
-            int consCount = tasks.Count / 2;
+            //Create 2 consumers for each producer count
+            int consumerCount = tasks.Count * 2;
 
-            if (consCount < 10)
-            {
-                consCount = 2;
-            }
+            Console.WriteLine("Producers: " + tasks.Count);
 
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < consumerCount; i++)
             {
                 var c = Task.Run(() =>
                 {
@@ -88,27 +87,12 @@ namespace KickChatRecorder
                 });
                 tasks.Add(c);
             }
-            //block calling thread - wait, forever pretty much rn
+
+            Console.WriteLine("Consumers: " + consumerCount);
+            //block until consumer and producer tasks complete i.e till restart token is canceled
             Task.WaitAll(tasks.ToArray());
 
             session.Dispose();
-
-            //test
-            //for (int i = 0; i < 20; i++)
-            //{
-            //    var client = factory.CreateTestClient(i.ToString());
-            //    await client.ConnectAsync();
-            //    var p = Task.Run(() =>
-            //    {
-            //        new TestProducer(channel.Writer, client);
-            //    });
-            //    tasks.Add(p);
-            //}
-
-            //20prod 20consum - Elapsed Time is 28408 ms
-            //20prod 4consum  - Elapsed Time is 37698 ms
-
-
         }
     }
 }

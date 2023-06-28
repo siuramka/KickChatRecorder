@@ -12,6 +12,6 @@ namespace KickChatRecorder.Models.Config
 
         // If pusher doesnt send any messages it sets a timer for a random time >= 2 minutes <= 30 minutes(I think), and if it doesnt receive a ping message it drops the connection
         // at what perdiod to send ping if client hasn't received a message.
-        public static int ActivityTimeoutSeconds = 5;
+        public static int ActivityTimeoutSeconds = 120;
     }
 }
