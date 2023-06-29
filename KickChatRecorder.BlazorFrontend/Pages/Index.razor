@@ -1,0 +1,39 @@
+﻿@page "/"
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@using KickChatRecorder.BlazorFrontend.Data;
+@inject HttpClient httpClient;
+
+<h1>Call web API from a Blazor Server Razor component</h1>
+
+@{
+    if (resp != null)
+    {
+        foreach(var msg in resp.messages)
+        {
+            <div>@msg.Username @msg.Text</div>
+        }
+        <button @onclick="GetNextPage">
+            Next
+        </button>
+        @resp.PagingInfo
+    }
+}
+
+@code {
+    private MessagesResponse resp;
+    private string LastPagingInfo="";
+    protected override async Task OnInitializedAsync()
+    {
+        await GetNextPage();
+    }
+
+    private async Task GetNextPage()
+    {
+        var response = await httpClient.GetFromJsonAsync<MessagesResponse>($"/Message/getmessages?channelname=ROSHTEIN&PagingInfo={LastPagingInfo}&PageSize=5");
+        resp = response;
+        LastPagingInfo = resp.PagingInfo.ToString();
+
+    }
+
+}

@@ -3,9 +3,9 @@ using KickChatRecorder.Models;
 using System.Text;
 using KickChatRecorder.Helpers;
 using System.Threading.Channels;
-using KickChatRecorder.Models.Config;
 using System.Text.Json;
 using System.Linq.Expressions;
+using KickChatRecorder.Models.Config;
 
 namespace KickChatRecorder
 {
