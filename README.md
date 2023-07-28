@@ -17,7 +17,8 @@ There are multiple Channels(Producers) to listen to that produce chat messages. 
 
 When a producer connects to the test websocket server, he receives N messages, basically filling the channel. Then main thread waits for the test producer to receive the data and starts consuming.
 
-10k messages
+10k messages per producer
+Total: 200k
 
 | Producers N  | Consumers N | Time (sec) |
 | ------------- | ------------- | ------------- |
@@ -27,7 +28,9 @@ When a producer connects to the test websocket server, he receives N messages, b
 |20	| 5 |	174 |
 |20|	1	| 471 |
 
-2k messages
+2k messages per producer
+Total: 20k
+
 | Producers N  | Consumers N | Time (sec) |
 | ------------- | ------------- | ------------- |
 | 20	| 80 |	59 |

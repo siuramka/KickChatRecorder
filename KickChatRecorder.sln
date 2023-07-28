@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KickChatRecorder.Test", "Ki
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KickChatRecorder.Api", "KickChatRecorder.Api\KickChatRecorder.Api.csproj", "{4A0A0642-F770-49B6-8AF8-17EFA4521635}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KickChatRecorder.BlazorFrontend", "KickChatRecorder.BlazorFrontend\KickChatRecorder.BlazorFrontend.csproj", "{8DDE7BDF-6F57-4216-ACE5-BDD38CD08CB9}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{4A0A0642-F770-49B6-8AF8-17EFA4521635}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A0A0642-F770-49B6-8AF8-17EFA4521635}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A0A0642-F770-49B6-8AF8-17EFA4521635}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8DDE7BDF-6F57-4216-ACE5-BDD38CD08CB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8DDE7BDF-6F57-4216-ACE5-BDD38CD08CB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8DDE7BDF-6F57-4216-ACE5-BDD38CD08CB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8DDE7BDF-6F57-4216-ACE5-BDD38CD08CB9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

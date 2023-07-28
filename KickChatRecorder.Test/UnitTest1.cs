@@ -27,10 +27,12 @@ public class Tests
     /// <summary>
     /// very much not clean code, wrote this just to test performance
     /// </summary>
-    [TestCase(20, 60, 2500)]
-    [TestCase(20, 50, 2500)]
-    [TestCase(20, 40, 2500)]
-    [TestCase(20, 20, 2500)]
+    [TestCase(20, 80, 2000)]
+    [TestCase(20, 30, 2000)]
+    [TestCase(20, 20, 2000)]
+    [TestCase(20, 10, 2000)]
+    [TestCase(20, 5, 2000)]
+    [TestCase(20, 1, 2000)]
     public async Task Test1(int producerCount, int consumerCount, int messagesPerProducer)
     {
         var channel = Channel.CreateUnbounded<MessageData>();

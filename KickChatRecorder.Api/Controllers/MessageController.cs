@@ -9,7 +9,7 @@ using System.Text;
 namespace KickChatRecorder.Api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/message/")]
     public class MessageController : ControllerBase
     {
         private IMapper _mapper;
@@ -20,7 +20,7 @@ namespace KickChatRecorder.Api.Controllers
         }
 
         [HttpGet]
-        [Route("getmessages")]
+        [Route("all")]
         public async Task<IActionResult> GetMessages([FromQuery] MessageParameters messageParameters)
         {
             if(messageParameters.PageSize > 100)
